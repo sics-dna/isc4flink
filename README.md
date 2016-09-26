@@ -1,9 +1,8 @@
 # isc4flink
-The ISC Anomaly Detection and Classification Framework implemented for [Apache Flink](https://flink.apache.org/). It provides the building blocks to create a distributed fault tolerant streaming anomaly detection pipeline in flink using "Bayesian Statistical Anomaly". Other ISC functionality will be ported if requested.
+Incremental Stream Clustering (ISC) framework implemented for [Apache Flink](https://flink.apache.org/). The current version provides the building blocks to create a distributed fault tolerant streaming anomaly detection pipeline in flink using "Bayesian Statistical Anomaly". Other ISC functionality will be ported if requested.
 
 ## Bayesian Statistical Anomaly in a Nutshell
-At the core of this approach lies a function that compares an observed distribution of a certain type with a distribution of the same type defined by previously seen values. Supported distributions are lognormal, normal, poisson and exponential.
-The library takes a stream of events and splits it into time windows. For each such window the number of events and the distribution defining property is stored. (e.g. for Poisson the average value) Each window is compared to a set of windows seen before (history). The result is a score representing the probability that the window and the history are the same distribution.
+Given a predetermied type of distribution, Bayesian Statiscial Anomaly allows to compare a set of datapoints (window) with data seen in the past (history). Each window is condensed into the defining property of its distribution (e.g. number of datapoints and total sum for the poisson distribution) allowing for a constant size memory footprint. This implementation currently supports two types of history trailing and periodic history. Trailing history is a collection of values defnining the last n windows. If the data has a know periodicity, e.g. day night cycle, a periodic history can be used only comparing current data to data from the last period. The window is compared with the history using a bayesian process making the approach robust to changes in frequency of datapoints. For each window a score is produced representing the probability that the window and the history came from the same distribution. Currently supported distributions are: lognormal, normal, poisson and exponential. 
 
 **Strengths:**
 
@@ -25,6 +24,7 @@ In order to use this approach the data needs to fulfill the following requiremen
 2. **The values observed need to be normal, lognormal, exponential or poisson distributed**
 3. The shape of the distribution can change but not the type. For example you cannot switch from normal to exponential at runtime.
 4. If data with timestamps is used there needs to be a limit on how much out of order the events can be.
+5. The implementation will process the data in parallel only if it can be split into independent substreams. A singel stream for a singel model will be run on a single worker.
 
 ## How to use it
 You need to find out what distribution the values follow before you can setup a pipeline. Then create a Flink streaming job or modify **KeyedExponentialExample.java**. First configure the Flink environment and set fault tolerance and timestamps if needed. Connect a source to get the input stream.
