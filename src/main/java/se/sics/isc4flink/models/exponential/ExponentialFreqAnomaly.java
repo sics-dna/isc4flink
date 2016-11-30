@@ -37,11 +37,11 @@ public class ExponentialFreqAnomaly<K,V> {
     private KeyedAnomalyFlatMap<K,PoissonModel> afm;
 
     public ExponentialFreqAnomaly(boolean addIfAnomaly, double anomalyLevel, History hist){
-        this.afm = new KeyedAnomalyFlatMap<>(14d,new PoissonModel(hist), true);
+        this.afm = new KeyedAnomalyFlatMap<>(14d,new PoissonModel(hist), addIfAnomaly);
     }
 
     public ExponentialFreqAnomaly(History hist){
-        new ExponentialFreqAnomaly(false,14d,hist);
+        this(false,14d,hist);
     }
 
     public DataStream<Tuple2<K, AnomalyResult>> getAnomalySteam(DataStream<V> ds, KeySelector<V, K> keySelector,  Time window) {
@@ -58,6 +58,7 @@ public class ExponentialFreqAnomaly<K,V> {
                 .timeWindow(window)
                 .apply(init, new CountWindFold<>(keySelector, window, resultType),new WindowTimeExtractor(resultType))
                 .keyBy(0);
+
 
         return kPreStream.flatMap(afm);
     }

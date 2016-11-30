@@ -38,11 +38,11 @@ public class PoissonFreqAnomaly<K,V> {
     private KeyedAnomalyFlatMap<K,PoissonModel> afm;
 
     public PoissonFreqAnomaly(boolean addIfAnomaly, double anomalyLevel, History hist){
-        this.afm = new KeyedAnomalyFlatMap<>(14d,new PoissonModel(hist), true);
+        this.afm = new KeyedAnomalyFlatMap<>(14d,new PoissonModel(hist), addIfAnomaly);
     }
 
     public PoissonFreqAnomaly(History hist){
-        new PoissonFreqAnomaly(false,14d,hist);
+        this(false,14d,hist);
     }
 
     public DataStream<Tuple2<K, AnomalyResult>> getAnomalySteam(DataStream<V> ds, KeySelector<V, K> keySelector , Time window) {

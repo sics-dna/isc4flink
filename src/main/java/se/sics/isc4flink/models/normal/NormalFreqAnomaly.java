@@ -36,14 +36,14 @@ public class NormalFreqAnomaly<K,V> {
     private KeyedAnomalyFlatMap<K,NormalModel> afm;
 
     public NormalFreqAnomaly(boolean addIfAnomaly, double anomalyLevel, History hist){
-        this.afm = new KeyedAnomalyFlatMap<>(14d,new NormalModel(hist), true);
+        this.afm = new KeyedAnomalyFlatMap<>(14d,new NormalModel(hist), addIfAnomaly);
     }
 
     public NormalFreqAnomaly(History hist){
-        new NormalFreqAnomaly(false,14d,hist);
+        this(false,14d,hist);
     }
 
-    public DataStream<Tuple2<K, AnomalyResult>> getAnomalySteam(DataStream<V> ds, KeySelector<V, K> keySelector , KeySelector<V,Double> valueSelector,  Time window) {
+    public DataStream<Tuple2<K, AnomalyResult>> getAnomalySteam(DataStream<V> ds, KeySelector<V, K> keySelector , Time window) {
 
         KeyedStream<V, K> keyedInput = ds
                 .keyBy(keySelector);

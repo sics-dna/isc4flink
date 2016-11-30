@@ -36,11 +36,11 @@ public class NormalValueAnomaly<K,V> {
     private KeyedAnomalyFlatMap<K,NormalModel> afm;
 
     public NormalValueAnomaly(boolean addIfAnomaly, double anomalyLevel, History hist){
-        this.afm = new KeyedAnomalyFlatMap<>(14d,new NormalModel(hist), true);
+        this.afm = new KeyedAnomalyFlatMap<>(14d,new NormalModel(hist), addIfAnomaly);
     }
 
     public NormalValueAnomaly(History hist){
-        new NormalValueAnomaly(false,14d,hist);
+        this(false,14d,hist);
     }
 
     public DataStream<Tuple2<K, AnomalyResult>> getAnomalySteam(DataStream<V> ds, KeySelector<V, K> keySelector , KeySelector<V,Double> valueSelector, Time window) {

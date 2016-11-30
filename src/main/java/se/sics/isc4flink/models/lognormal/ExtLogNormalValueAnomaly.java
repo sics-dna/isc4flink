@@ -40,11 +40,11 @@ public class ExtLogNormalValueAnomaly<K,V,RV> {
     private ExtKeyedAnomalyFlatMap<K,NormalModel,RV> afm;
 
     public ExtLogNormalValueAnomaly(boolean addIfAnomaly, double anomalyLevel, History hist){
-        this.afm = new ExtKeyedAnomalyFlatMap<>(14d,new NormalModel(hist), true);
+        this.afm = new ExtKeyedAnomalyFlatMap<>(14d,new NormalModel(hist), addIfAnomaly);
     }
 
     public ExtLogNormalValueAnomaly(History hist){
-        new ExtLogNormalValueAnomaly(false,14d,hist);
+        this(false,14d,hist);
     }
     public DataStream<Tuple3<K, AnomalyResult, RV>> getAnomalySteam(DataStream<V> ds, KeySelector<V, K> keySelector, KeySelector<V,Double> valueSelector, PayloadFold<V, RV> valueFold, Time window) {
 

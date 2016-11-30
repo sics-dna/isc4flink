@@ -40,11 +40,11 @@ public class ExtPoissonFreqAnomaly<K,V,RV> {
     private ExtKeyedAnomalyFlatMap<K,PoissonModel,RV> afm;
 
     public ExtPoissonFreqAnomaly(boolean addIfAnomaly, double anomalyLevel, History hist){
-        this.afm = new ExtKeyedAnomalyFlatMap<>(14d,new PoissonModel(hist), true);
+        this.afm = new ExtKeyedAnomalyFlatMap<>(14d,new PoissonModel(hist), addIfAnomaly);
     }
 
     public ExtPoissonFreqAnomaly(History hist){
-        new ExtPoissonFreqAnomaly(false,14d,hist);
+        this(false,14d,hist);
     }
 
     public DataStream<Tuple3<K, AnomalyResult, RV>> getAnomalySteam(DataStream<V> ds, KeySelector<V, K> keySelector , PayloadFold<V, RV> valueFold, Time window) {

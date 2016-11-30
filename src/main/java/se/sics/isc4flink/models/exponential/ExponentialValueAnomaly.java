@@ -39,7 +39,7 @@ public class ExponentialValueAnomaly<K,V> {
     private KeyedAnomalyFlatMap<K,PoissonModel> afm;
 
     public ExponentialValueAnomaly(boolean addIfAnomaly, double anomalyLevel, History hist){
-        this.afm = new KeyedAnomalyFlatMap<>(14d,new PoissonModel(hist), true);
+        this.afm = new KeyedAnomalyFlatMap<>(14d,new PoissonModel(hist), addIfAnomaly);
     }
 
     public ExponentialValueAnomaly(History hist){
