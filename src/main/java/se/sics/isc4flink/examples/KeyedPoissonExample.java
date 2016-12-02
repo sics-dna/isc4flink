@@ -26,9 +26,7 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 import se.sics.isc4flink.core.AnomalyResult;
 import se.sics.isc4flink.history.History;
 import se.sics.isc4flink.history.HistoryTrailing;
-import se.sics.isc4flink.models.normal.NormalFreqAnomaly;
 import se.sics.isc4flink.models.poisson.PoissonFreqAnomaly;
-import se.sics.isc4flink.models.poisson.PoissonValueAnomaly;
 
 public class KeyedPoissonExample {
     public static void main(String[] args) throws Exception {
@@ -38,9 +36,9 @@ public class KeyedPoissonExample {
                 = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setStreamTimeCharacteristic(TimeCharacteristic.IngestionTime);
 
-        // generate stream
+        // generate stream data will become anomalous after 100000 milli seconds
         DataStream<Tuple3<String, Long,Double>> inStream
-                = env.addSource(new PoissonFrequencyGenerator());
+                = env.addSource(new PoissonFrequencyGenerator1(10000));
 
         // Choose and a History defining what the latest window will be compared to. In this case each new window will be compared to the aggregation of the last two windows.
         History hist
@@ -55,9 +53,7 @@ public class KeyedPoissonExample {
                 = anomalyDetector.getAnomalySteam(inStream,new KExtract(),Time.seconds(5));
 
         // print the result
-        //result.print();
-        result.addSink(new AnomalyResultSink());
-
+        result.print();
 
         env.execute("Simple Exponential Example Keyed");
     }

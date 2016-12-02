@@ -8,20 +8,40 @@ import java.util.Random;
 /**
  * Created by mneumann on 2016-11-30.
  */
-public class PoissonFrequencyGenerator implements SourceFunction<Tuple3<String,Long,Double>>{
-    private double mean = 200d;
-    private double meanFault = 10d;
+public class PoissonFrequencyGenerator1 implements SourceFunction<Tuple3<String,Long,Double>>{
+    private static double mean = 200d;
+    private static double meanFault = 10d;
     private static volatile Random rnd = new Random();
     private volatile boolean isRunning = true;
     private long starttime;
+    private static long delay = 100000;
 
     private volatile boolean anomaly = false;
-    private volatile boolean anomalyK2 = false;
-    private volatile double repeatK2 = -1;
     private volatile long numK1 = 0;
-    private volatile long numK2 = 0;
 
-    private SourceFunction.SourceContext<Tuple3<String,Long, Double>> sourceContextback;
+    private static FrequencyGeneratorButton button = null;
+
+
+    public PoissonFrequencyGenerator1(double mean, double meanfault, long delay){
+        this.mean = mean;
+        this.meanFault = meanfault;
+        this.delay = delay;
+    }
+
+    public PoissonFrequencyGenerator1(long delay){
+        this.delay = delay;
+    }
+
+    public PoissonFrequencyGenerator1(){
+        this.button = new FrequencyGeneratorButton();
+
+    }
+
+    public PoissonFrequencyGenerator1(double mean, double meanfault){
+        this.mean = mean;
+        this.meanFault = meanfault;
+        this.button = new FrequencyGeneratorButton();
+    }
 
     private static int getPoissonRandom(double mean) {
 
@@ -35,14 +55,22 @@ public class PoissonFrequencyGenerator implements SourceFunction<Tuple3<String,L
         return k - 1;
     }
 
-
-
     @Override
     public void run(SourceFunction.SourceContext<Tuple3<String,Long, Double>> sourceContext) throws Exception {
-        this.sourceContextback = sourceContext;
         this.starttime= System.currentTimeMillis();
+        if(button!= null){
+            javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    button.createAndShowGUI();
+                }
+            });
+        }
+
         while(isRunning){
 
+            if(button!=null){
+                anomaly = button.anomaly;
+            }
             if(!anomaly){
                 int val = getPoissonRandom(mean);
                 Thread.sleep(getPoissonRandom(mean));
@@ -54,42 +82,17 @@ public class PoissonFrequencyGenerator implements SourceFunction<Tuple3<String,L
             }
             numK1++;
 
-            if(System.currentTimeMillis()-starttime > 10000 && !anomaly){
+            if(System.currentTimeMillis()-starttime > delay && !anomaly && button!=null){
                 anomaly = true;
-                System.out.println("--------------------anomaly");
             }
-
-
-                /*
-                //generator for K2
-                double k2val;
-                if(!anomalyK2){
-                    k2val = getPoissonRandom(mean);
-                    if(rnd.nextInt(20)==1)anomalyK2 = true;
-                }else {
-                    k2val = getPoissonRandom(meanFault);
-
-                    if (rnd.nextInt(8) == 1) anomalyK2 = false;
-                }
-
-                if (repeatK2 == -1){
-                    sourceContext.collect(new Tuple3<>("key2", numK2 ,k2val));
-                    if (rnd.nextInt(10) == 1) {
-                        repeatK2 = k2val;
-                    }
-                }else{
-                    sourceContext.collect(new Tuple3<>("key2", numK2 ,repeatK2));
-                    if (rnd.nextInt(5) == 1) {
-                        repeatK2 = -1;
-                    }
-                    numK2++;
-                }
-                */
         }
     }
+
 
     @Override
     public void cancel() {
         isRunning = false;
     }
+
+
 }

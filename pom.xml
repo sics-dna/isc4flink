@@ -21,11 +21,11 @@ under the License.
 	<modelVersion>4.0.0</modelVersion>
 	
 	<groupId>se.sics.anomaly</groupId>
-	<artifactId>BS-AnomalyDetection</artifactId>
+	<artifactId>isc4flink</artifactId>
 	<version>0.1</version>
 	<packaging>jar</packaging>
 
-	<name>BS-AnomalyDetection</name>
+	<name>isc4flink</name>
 	<url>http://www.sics.se</url>
 
 	<properties>

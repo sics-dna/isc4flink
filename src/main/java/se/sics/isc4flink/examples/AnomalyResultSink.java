@@ -35,20 +35,6 @@ public class AnomalyResultSink implements SinkFunction<Tuple2<String,AnomalyResu
         res.append("\t");
         res.append(anomalyResult.f1.getScore());
 
-        Tuple2<Double,Double> hist = (Tuple2<Double,Double>) anomalyResult.f1.getHistory();
-        Tuple2<Double,Double> wind = (Tuple2<Double,Double>) anomalyResult.f1.getWindow();
-
-        if( hist != null){
-            res.append("\t");
-            res.append(wind.f1 / wind.f0);
-            res.append("\t");
-            res.append(hist.f1/hist.f0);
-        }else{
-            res.append("\t");
-            res.append("na");
-            res.append("\t");
-            res.append("na");
-        }
         return res.toString();
     }
 }
